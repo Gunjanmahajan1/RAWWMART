@@ -36,7 +36,20 @@ try {
 // ── MIDDLEWARE ──
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.static(path.join(__dirname, '../frontend')));
+
+// Ensure DB connection for serverless API invocations
+app.use('/api', async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    try {
+      await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 5000 });
+    } catch (err) {
+      // Proceed so routes can handle or log errors appropriately
+    }
+  }
+  next();
+});
 
 // ── ROUTES ──
 const authRoutes         = require('./routes/auth');
@@ -94,7 +107,7 @@ async function startServer() {
   }
 
   // Only listen to port if not running on Vercel
-  if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  if (!process.env.VERCEL) {
     app.listen(PORT, () => {
       console.log(`🚀 RAWWMART server running at http://localhost:${PORT}`);
     });
