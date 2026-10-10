@@ -2,16 +2,14 @@
 //  RAWWMART - Main Server File
 // ─────────────────────────────────────────
 
+// Always load .env first — before any other require that reads process.env
+require('dotenv').config();
+
 const express  = require('express');
 const mongoose = require('mongoose');
 const cors     = require('cors');
 const path     = require('path');
 const admin    = require('firebase-admin');
-
-// Load .env only in development
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
 
 const app = express();
 
@@ -42,8 +40,9 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 // Ensure DB connection for serverless API invocations
 app.use('/api', async (req, res, next) => {
   if (mongoose.connection.readyState !== 1) {
+    const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rawwmart';
     try {
-      await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 5000 });
+      await mongoose.connect(uri, { serverSelectionTimeoutMS: 30000 });
     } catch (err) {
       // Proceed so routes can handle or log errors appropriately
     }
@@ -83,12 +82,13 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rawwmart';
 
 async function startServer() {
   try {
-    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 5000 });
-    console.log('✅ Connected to MongoDB database');
+    // serverSelectionTimeoutMS: 30s — Atlas SRV needs extra time for DNS + TLS handshake
+    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 30000 });
+    console.log('✅ Connected to MongoDB Atlas database');
   } catch (err) {
     console.warn(`⚠️ Connection to primary MONGO_URI failed (${err.message}). Falling back to local MongoDB...`);
     try {
-      await mongoose.connect('mongodb://127.0.0.1:27017/rawwmart');
+      await mongoose.connect('mongodb://127.0.0.1:27017/rawwmart', { serverSelectionTimeoutMS: 5000 });
       console.log('✅ Connected to local MongoDB database (mongodb://127.0.0.1:27017/rawwmart)');
     } catch (localErr) {
       console.error('❌ Database connection failed:', localErr.message);
