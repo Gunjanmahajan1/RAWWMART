@@ -40,11 +40,24 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 // Ensure DB connection for serverless API invocations
 app.use('/api', async (req, res, next) => {
   if (mongoose.connection.readyState !== 1) {
-    const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rawwmart';
+    const uri = process.env.MONGO_URI || (process.env.VERCEL ? null : 'mongodb://127.0.0.1:27017/rawwmart');
+    if (!uri) {
+      console.error('❌ MONGO_URI is not configured in environment variables!');
+      return res.status(500).json({
+        message: 'Server configuration error: MONGO_URI is missing in Vercel Environment Variables. Please add it in Vercel Project Settings.'
+      });
+    }
     try {
-      await mongoose.connect(uri, { serverSelectionTimeoutMS: 30000 });
+      await mongoose.connect(uri, {
+        serverSelectionTimeoutMS: 10000,
+        connectTimeoutMS: 10000
+      });
+      console.log('✅ Connected to MongoDB Atlas on serverless request');
     } catch (err) {
-      // Proceed so routes can handle or log errors appropriately
+      console.error('❌ MongoDB connection failed on serverless request:', err.message);
+      return res.status(500).json({
+        message: `Database connection error: ${err.message}. If using MongoDB Atlas, make sure Network Access allows IP 0.0.0.0/0.`
+      });
     }
   }
   next();
@@ -81,6 +94,12 @@ const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rawwmart';
 
 async function startServer() {
+  // On Vercel, requests are handled on-demand per invocation via serverless functions.
+  // Avoid heavy auto-seeding or listening on ports in serverless containers.
+  if (process.env.VERCEL) {
+    return;
+  }
+
   try {
     // serverSelectionTimeoutMS: 30s — Atlas SRV needs extra time for DNS + TLS handshake
     await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 30000 });
