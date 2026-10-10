@@ -4,7 +4,7 @@
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
-const BACKEND = 'https://rawwmart-backend.onrender.com';
+const BACKEND = self.location.origin;
 
 fetch(`${BACKEND}/api/notifications/firebase-config`)
   .then((response) => {

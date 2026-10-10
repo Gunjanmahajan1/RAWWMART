@@ -2,7 +2,7 @@
 // Include this script in vendor and supplier pages
 
 const VAPID_KEY = "BD9MRC4oJkRFaXTazDoVCBC6MZPKW_TXZl_3cAWfQ37uWF7pF7Hq9kIDkkOe0pGDV-f26E1vT_x4a0_JZyL2mtQ";
-const BACKEND   = "https://rawwmart-backend.onrender.com";
+const BACKEND   = window.location.origin;
 
 // Firebase config
 const firebaseConfig = {

@@ -50,8 +50,7 @@ RAWWMART is a Node.js + Express backend with a static frontend served from `back
     ```
 
 4. Open the app in a browser:
-    
-
+    http://localhost:5000
 
 ## What is implemented
 
@@ -64,5 +63,29 @@ RAWWMART is a Node.js + Express backend with a static frontend served from `back
 - Notification API endpoints to save FCM tokens and send push messages.
 - Static frontend pages for onboarding, login, dashboards, and order interaction.
 
+## Deployment
 
+### Full-Stack Deployment (Vercel)
+
+The entire application (backend + frontend) is deployed on Vercel. Configuration is in `vercel.json`.
+
+**Required Environment Variables on Vercel:**
+- `MONGO_URI` - MongoDB connection string
+- `JWT_SECRET` - Secret key for JWT token signing
+- `FIREBASE_API_KEY` - Firebase client API key
+- `FIREBASE_SERVICE_ACCOUNT` - Firebase admin service account JSON
+
+**Deploy to Vercel:**
+1. Go to https://vercel.com/
+2. Click "Add New..." → "Project"
+3. Connect your GitHub repository `Gunjanmahajan1/RAWWMART`
+4. Vercel will automatically detect the `vercel.json` configuration
+5. Add the required environment variables in Vercel dashboard
+6. Click "Deploy"
+7. Access at: https://rawwmart.vercel.app
+
+**Architecture:**
+- Backend API routes: `/api/*` → handled by Node.js serverless functions
+- Frontend static files: `/*` → served from `frontend/` directory
+- Both backend and frontend deployed on the same Vercel domain
 

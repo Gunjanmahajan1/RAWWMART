@@ -93,9 +93,15 @@ async function startServer() {
     console.warn('⚠️ Auto-seeding failed:', seedErr.message);
   }
 
-  app.listen(PORT, () => {
-    console.log(`🚀 RAWWMART server running at http://localhost:${PORT}`);
-  });
+  // Only listen to port if not running on Vercel
+  if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    app.listen(PORT, () => {
+      console.log(`🚀 RAWWMART server running at http://localhost:${PORT}`);
+    });
+  }
 }
 
 startServer();
+
+// Export for Vercel
+module.exports = app;
