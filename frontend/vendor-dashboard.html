@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RAWWMART — Vendor Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --orange: #FF5C1A; --dark: #0F0F0F; --card: #181818;
+    --card2: #1E1E1E; --muted: #888; --white: #FFFFFF;
+    --green: #1DB954; --border: rgba(255,255,255,0.09);
+    --font-display: 'Archivo Black', sans-serif;
+    --font-body: 'Outfit', sans-serif;
+  }
+  body { background: var(--dark); color: var(--white); font-family: var(--font-body); min-height: 100vh; }
+ 
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 28px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  .logo { font-family: var(--font-display); font-size: 1.3rem; letter-spacing: -1px; color: var(--white); text-decoration: none; }
+  .logo span { color: var(--orange); }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .user-name { font-size: 0.88rem; color: var(--muted); }
+  .logout-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 7px 16px; border-radius: 20px; font-family: var(--font-body); font-size: 0.82rem; cursor: pointer; transition: all 0.2s; }
+  .logout-btn:hover { border-color: var(--orange); color: var(--orange); }
+ 
+  /* MAIN */
+  .main { max-width: 900px; margin: 0 auto; padding: 36px 24px; }
+ 
+  .welcome { margin-bottom: 32px; }
+  .welcome h1 { font-family: var(--font-display); font-size: 1.8rem; letter-spacing: -1px; margin-bottom: 6px; }
+  .welcome p  { color: var(--muted); font-size: 0.95rem; font-weight: 300; }
+ 
+  /* STATS */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 32px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+  .stat-num { font-family: var(--font-display); font-size: 1.6rem; color: var(--white); }
+  .stat-num span { color: var(--orange); }
+  .stat-label { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
+ 
+  /* SEARCH */
+  .search-section { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 28px; margin-bottom: 28px; }
+  .section-title { font-family: var(--font-display); font-size: 1.1rem; letter-spacing: -0.5px; margin-bottom: 16px; }
+  .search-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+  .search-bar input { flex: 1; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 13px 18px; color: var(--white); font-family: var(--font-body); font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
+  .search-bar input:focus { border-color: var(--orange); }
+  .search-bar input::placeholder { color: rgba(255,255,255,0.2); }
+  .search-btn { background: var(--orange); border: none; border-radius: 12px; padding: 13px 24px; color: white; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
+  .search-btn:hover { opacity: 0.9; }
+ 
+  .quick-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag { background: var(--card2); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 0.82rem; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+  .tag:hover { border-color: var(--orange); color: var(--orange); }
+ 
+  /* SUPPLIERS */
+  .suppliers-section { margin-bottom: 28px; }
+  .suppliers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin-top: 16px; }
+  .supplier-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 22px; transition: border-color 0.2s, transform 0.2s; }
+  .supplier-card:hover { border-color: rgba(255,92,26,0.4); transform: translateY(-3px); }
+  .supplier-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .supplier-avatar { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,92,26,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+  .supplier-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 3px; }
+  .supplier-dist { font-size: 0.78rem; color: var(--green); }
+  .supplier-address { font-size: 0.82rem; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  .gst-badge { display: inline-block; background: rgba(29,185,84,0.1); border: 1px solid rgba(29,185,84,0.25); border-radius: 20px; padding: 3px 10px; font-size: 0.75rem; color: var(--green); margin-bottom: 14px; }
+  .order-btn { width: 100%; padding: 11px; background: var(--orange); border: none; border-radius: 10px; color: white; font-family: var(--font-body); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+  .order-btn:hover { opacity: 0.9; }
+ 
+  /* ORDER MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 32px; width: 100%; max-width: 460px; }
+  .modal h2 { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 6px; }
+  .modal p  { font-size: 0.85rem; color: var(--muted); margin-bottom: 24px; }
+  .modal label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 6px; }
+  .modal input, .modal select { width: 100%; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--white); font-family: var(--font-body); font-size: 0.9rem; outline: none; margin-bottom: 16px; }
+  .modal input:focus, .modal select:focus { border-color: var(--orange); }
+  .modal select option { background: var(--card2); }
+  .item-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; }
+  .add-item-btn { width: 100%; padding: 10px; background: transparent; border: 1px dashed rgba(255,92,26,0.4); border-radius: 10px; color: var(--orange); font-family: var(--font-body); font-size: 0.85rem; cursor: pointer; margin-bottom: 16px; transition: background 0.2s; }
+  .add-item-btn:hover { background: rgba(255,92,26,0.08); }
+  .modal-actions { display: flex; gap: 10px; }
+  .cancel-btn { flex: 1; padding: 12px; background: transparent; border: 1px solid var(--border); border-radius: 10px; color: var(--muted); font-family: var(--font-body); font-size: 0.9rem; cursor: pointer; }
+  .place-btn   { flex: 2; padding: 12px; background: var(--orange); border: none; border-radius: 10px; color: white; font-family: var(--font-body); font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+  .place-btn:hover { opacity: 0.9; }
+ 
+  /* MY ORDERS */
+  .orders-section { margin-bottom: 28px; }
+  .order-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-top: 12px; }
+  .order-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .order-supplier { font-weight: 600; font-size: 0.95rem; }
+  .order-date { font-size: 0.78rem; color: var(--muted); }
+  .order-items { font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; line-height: 1.6; }
+  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; }
+  .status-pending      { background: rgba(250,204,21,0.12); color: #FBBF24; }
+  .status-accepted     { background: rgba(29,185,84,0.12); color: var(--green); }
+  .status-preparing    { background: rgba(59,130,246,0.12); color: #60A5FA; }
+  .status-out_for_delivery { background: rgba(255,92,26,0.12); color: var(--orange); }
+  .status-delivered    { background: rgba(29,185,84,0.12); color: var(--green); }
+  .status-rejected     { background: rgba(239,68,68,0.12); color: #F87171; }
+ 
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 0.9rem; }
+  .empty-icon  { font-size: 2.5rem; margin-bottom: 12px; }
+ 
+  .success-toast { display: none; position: fixed; bottom: 28px; right: 28px; background: var(--green); color: white; padding: 14px 22px; border-radius: 12px; font-size: 0.9rem; font-weight: 500; z-index: 300; animation: slideUp 0.3s ease; }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+ 
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 6px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+ 
+  /* FLOATING AI CHATBOT WIDGET */
+  .ai-fab {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 999;
+    background: linear-gradient(135deg, var(--orange) 0%, #E04808 100%);
+    color: white;
+    border: none;
+    border-radius: 40px;
+    padding: 14px 22px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(255,92,26,0.45);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .ai-fab:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 12px 30px rgba(255,92,26,0.6);
+  }
+  .ai-fab-badge {
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  .ai-chat-popup {
+    display: none;
+    position: fixed;
+    bottom: 90px;
+    right: 28px;
+    width: 440px;
+    max-width: calc(100vw - 32px);
+    height: 600px;
+    max-height: calc(100vh - 110px);
+    background: rgba(20, 20, 20, 0.97);
+    border: 1px solid rgba(255, 92, 26, 0.35);
+    backdrop-filter: blur(16px);
+    border-radius: 22px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    z-index: 1000;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUpPopup 0.3s ease;
+  }
+  .ai-chat-popup.open {
+    display: flex;
+  }
+  @keyframes slideUpPopup {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .ai-popup-header {
+    background: linear-gradient(135deg, rgba(255,92,26,0.2) 0%, rgba(24,24,24,0.9) 100%);
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .ai-popup-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ai-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .ai-close-btn:hover {
+    color: var(--white);
+  }
+  .ai-popup-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    overflow: hidden;
+  }
+  .ai-prompt-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .ai-pill {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.85);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ai-pill:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+    background: rgba(255,92,26,0.1);
+  }
+  .ai-chat-box {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .chat-msg {
+    display: flex;
+    gap: 10px;
+    max-width: 95%;
+  }
+  .chat-msg.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+  .msg-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: rgba(255,92,26,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .chat-msg.user .msg-avatar {
+    background: rgba(29,185,84,0.2);
+  }
+  .msg-content {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+  .chat-msg.user .msg-content {
+    background: rgba(255,92,26,0.2);
+    border-color: rgba(255,92,26,0.3);
+  }
+  .ai-input-group {
+    display: flex;
+    gap: 8px;
+  }
+  .ai-input-group input {
+    flex: 1;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 11px 16px;
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .ai-input-group input:focus {
+    border-color: var(--orange);
+  }
+  .ai-send-btn {
+    background: var(--orange);
+    border: none;
+    border-radius: 12px;
+    padding: 11px 18px;
+    color: white;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .ai-send-btn:hover {
+    opacity: 0.9;
+  }
+
+  /* RECOMMENDATION CARD UI */
+  .rec-card {
+    background: var(--card);
+    border: 1px solid rgba(255,92,26,0.3);
+    border-radius: 16px;
+    padding: 18px;
+    margin-top: 10px;
+    width: 100%;
+  }
+  .rec-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .rec-dish-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--white);
+  }
+  .rec-badge {
+    background: rgba(29,185,84,0.15);
+    color: var(--green);
+    border: 1px solid rgba(29,185,84,0.3);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .rec-badge.over {
+    background: rgba(239,68,68,0.15);
+    color: #F87171;
+    border-color: rgba(239,68,68,0.3);
+  }
+  .budget-bar-container {
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .rec-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-bottom: 14px;
+  }
+  .rec-table th {
+    text-align: left;
+    color: var(--muted);
+    font-weight: 500;
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .rec-table td {
+    padding: 10px 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: middle;
+  }
+  .prod-img {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #222;
+  }
+  .qty-input {
+    width: 65px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: white;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    text-align: center;
+    outline: none;
+  }
+  .qty-input:focus {
+    border-color: var(--orange);
+  }
+  .rec-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .rec-total {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--white);
+  }
+  .rec-order-btn {
+    background: var(--orange);
+    border: none;
+    border-radius: 10px;
+    padding: 11px 22px;
+    color: white;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .rec-order-btn:hover {
+    opacity: 0.9;
+  }
+
+  @media(max-width: 600px) {
+    .stats { grid-template-columns: 1fr 1fr; }
+    .item-row { grid-template-columns: 1fr 1fr; }
+    .rec-footer { flex-direction: column; gap: 10px; align-items: stretch; }
+    .rec-order-btn { width: 100%; text-align: center; }
+  }
+</style>
+</head>
+<body>
+ 
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo">RAWW<span>MART</span></a>
+  <div class="nav-right">
+    <span class="user-name" id="nav-username">Welcome!</span>
+    <button class="logout-btn" onclick="logout()">Log out</button>
+  </div>
+</nav>
+ 
+<div class="main">
+ 
+  <!-- WELCOME -->
+  <div class="welcome">
+    <h1 id="welcome-msg">Good day! 👋</h1>
+    <p>Search for raw materials and order from suppliers near your stall.</p>
+  </div>
+ 
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-num" id="total-orders">0</div>
+      <div class="stat-label">Total orders</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="active-orders">0</div>
+      <div class="stat-label">Active orders</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num"><span>10</span>km</div>
+      <div class="stat-label">Search radius</div>
+    </div>
+  </div>
+ 
+  <!-- SEARCH -->
+  <div class="search-section">
+    <div class="section-title">Search raw materials</div>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search for onions, flour, oil, milk..."/>
+      <button class="search-btn" onclick="searchSuppliers()">Find Suppliers →</button>
+    </div>
+    <div class="quick-tags">
+      <div class="tag" onclick="quickSearch('Onions')">🧅 Onions</div>
+      <div class="tag" onclick="quickSearch('Flour')">🌾 Flour</div>
+      <div class="tag" onclick="quickSearch('Oil')">🫙 Oil</div>
+      <div class="tag" onclick="quickSearch('Milk')">🥛 Milk</div>
+      <div class="tag" onclick="quickSearch('Tomatoes')">🍅 Tomatoes</div>
+      <div class="tag" onclick="quickSearch('Rice')">🍚 Rice</div>
+      <div class="tag" onclick="quickSearch('Sugar')">🍬 Sugar</div>
+    </div>
+  </div>
+ 
+  <!-- NEARBY SUPPLIERS -->
+  <div class="suppliers-section">
+    <div class="section-title">Nearby suppliers <span style="font-size:0.8rem;color:var(--muted);font-family:var(--font-body);font-weight:300;" id="supplier-count"></span></div>
+    <div class="suppliers-grid" id="suppliers-grid">
+      <!-- Demo suppliers shown by default -->
+    </div>
+  </div>
+ 
+  <!-- MY ORDERS -->
+  <div class="orders-section">
+    <div class="section-title">My orders</div>
+    <div id="orders-list">
+      <div class="empty-state">
+        <div class="empty-icon">📦</div>
+        <p>No orders yet. Search for suppliers and place your first order!</p>
+      </div>
+    </div>
+  </div>
+ 
+</div>
+ 
+<!-- ORDER MODAL -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal">
+    <h2>Place Order</h2>
+    <p id="modal-supplier-name">Ordering from supplier</p>
+    <div id="items-container">
+      <div class="item-row">
+        <div>
+          <label>Item name</label>
+          <input type="text" placeholder="e.g. Onions" class="item-name"/>
+        </div>
+        <div>
+          <label>Quantity</label>
+          <input type="number" placeholder="10" class="item-qty" min="1"/>
+        </div>
+        <div>
+          <label>Unit</label>
+          <select class="item-unit">
+            <option>kg</option>
+            <option>litre</option>
+            <option>dozen</option>
+            <option>piece</option>
+            <option>bag</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <button class="add-item-btn" onclick="addItemRow()">+ Add another item</button>
+    <label>Delivery address</label>
+    <input type="text" id="modal-delivery-addr" placeholder="Your stall address"/>
+    <label>Notes for supplier (optional)</label>
+    <input type="text" id="modal-notes" placeholder="e.g. Please deliver before 8am"/>
+    <div class="modal-actions">
+      <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+      <button class="place-btn" onclick="placeOrder()">Place Order →</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- SUCCESS TOAST -->
+<div class="success-toast" id="toast">✓ Order placed successfully!</div>
+
+<!-- FLOATING AI CHATBOT BUTTON -->
+<button class="ai-fab" onclick="toggleAIChat()">
+  <span class="ai-fab-badge"></span>
+  🤖 AI Recommendation Assistant
+</button>
+
+<!-- FLOATING AI CHAT POPUP WINDOW -->
+<div class="ai-chat-popup" id="ai-chat-popup">
+  <div class="ai-popup-header">
+    <div>
+      <div class="ai-popup-title">🤖 AI Raw Material Assistant</div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-top:2px;">Recipe Engine & Live Catalog Matching</div>
+    </div>
+    <button class="ai-close-btn" onclick="toggleAIChat()">✕</button>
+  </div>
+
+  <div class="ai-popup-body">
+    <!-- Quick Prompts -->
+    <div class="ai-prompt-pills">
+      <div class="ai-pill" onclick="sendQuickPrompt('100 plates of pav bhaji under ₹3,000')">🍲 100 Pav Bhaji ₹3k</div>
+      <div class="ai-pill" onclick="sendQuickPrompt('50 plates Vada Pav for tomorrow')">🥙 50 Vada Pav</div>
+      <div class="ai-pill" onclick="sendQuickPrompt('150 plates Pani Puri under ₹2,000')">🥟 150 Pani Puri</div>
+      <div class="ai-pill" onclick="sendQuickPrompt('200 plates Dosa and Poha')">🥞 200 Dosa & Poha</div>
+      <div class="ai-pill" onclick="sendQuickPrompt('80 plates Chole Bhature under ₹3,500')">🫓 80 Chole Bhature</div>
+    </div>
+
+    <!-- Chat Box -->
+    <div class="ai-chat-box" id="ai-chat-box">
+      <div class="chat-msg assistant">
+        <div class="msg-avatar">🤖</div>
+        <div class="msg-content">
+          Hello! 👋 I'm your RAWWMART AI Assistant. Tell me what dish you plan to cook (e.g. <i>"100 plates of Pav Bhaji with ₹3,000 budget"</i>) and I will calculate exact raw materials and match available products from local suppliers!
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Bar -->
+    <div class="ai-input-group">
+      <input type="text" id="ai-prompt-input" placeholder="Ask AI: e.g. 100 plates Pav Bhaji under ₹3000..." onkeypress="handleKeyPress(event)"/>
+      <button class="ai-send-btn" id="ai-send-btn" onclick="sendAIPrompt()">Ask ✨</button>
+    </div>
+  </div>
+</div>
+ 
+<script>
+  // ── Load user from localStorage ──
+  const user  = JSON.parse(localStorage.getItem('user') || '{}');
+  const token = localStorage.getItem('token');
+ 
+  // Redirect if not logged in
+  if (!token || !user.id) {
+    window.location.href = 'vendor-login.html';
+  }
+ 
+  // Set welcome message
+  document.getElementById('welcome-msg').textContent = `Good day, ${user.name || 'Vendor'}! 👋`;
+  document.getElementById('nav-username').textContent = user.name || '';
+ 
+  // ── Demo suppliers (shown by default) ──
+  const demoSuppliers = [
+    { _id: 'sup1', name: 'Sharma Traders', deliveryAddress: 'MIDC Bhosari, Pune', distance: '1.2 km', emoji: '🏭' },
+    { _id: 'sup2', name: 'Fresh Farm Supplies', deliveryAddress: 'Hadapsar Market, Pune', distance: '2.8 km', emoji: '🌿' },
+    { _id: 'sup3', name: 'Pune Wholesale Hub', deliveryAddress: 'Market Yard, Pune', distance: '4.5 km', emoji: '📦' },
+    { _id: 'sup4', name: 'Datta Agro Traders', deliveryAddress: 'Katraj, Pune', distance: '6.1 km', emoji: '🧺' },
+  ];
+ 
+  let currentSupplierId   = null;
+  let currentSupplierName = null;
+ 
+  // ── Render suppliers ──
+  function renderSuppliers(suppliers) {
+    const grid = document.getElementById('suppliers-grid');
+    document.getElementById('supplier-count').textContent = `(${suppliers.length} found)`;
+ 
+    if (suppliers.length === 0) {
+      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📍</div><p>No suppliers found nearby. Try a different search.</p></div>';
+      return;
+    }
+ 
+    grid.innerHTML = suppliers.map(s => `
+      <div class="supplier-card">
+        <div class="supplier-top">
+          <div class="supplier-avatar">${s.emoji || '🏭'}</div>
+          <div>
+            <div class="supplier-name">${s.name}</div>
+            <div class="supplier-dist">📍 ${s.distance || 'Nearby'}</div>
+          </div>
+        </div>
+        <div class="supplier-address">${s.deliveryAddress || s.address || ''}</div>
+        <div class="gst-badge">✓ GST Verified</div><br/>
+        <button class="order-btn" onclick="openModal('${s._id}', '${s.name}')">Order from this supplier →</button>
+      </div>
+    `).join('');
+  }
+ 
+  // Show demo suppliers on load
+  renderSuppliers(demoSuppliers);
+ 
+  // ── Search suppliers ──
+  function quickSearch(term) {
+    document.getElementById('search-input').value = term;
+    searchSuppliers();
+  }
+ 
+  async function searchSuppliers() {
+    const query = document.getElementById('search-input').value.trim();
+    const btn = document.querySelector('.search-btn');
+    btn.innerHTML = '<span class="spinner"></span>Searching...';
+    btn.disabled = true;
+ 
+    try {
+      // Try real API first
+      const res = await fetch(`/api/orders/nearby-suppliers?latitude=18.5204&longitude=73.8567&maxDistance=10000`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+ 
+      if (res.ok) {
+        const data = await res.json();
+        if (data.suppliers && data.suppliers.length > 0) {
+          renderSuppliers(data.suppliers.map(s => ({ ...s, distance: 'Nearby', emoji: '🏭' })));
+        } else {
+          // Show demo suppliers if no real ones yet
+          renderSuppliers(demoSuppliers);
+        }
+      } else {
+        renderSuppliers(demoSuppliers);
+      }
+    } catch {
+      renderSuppliers(demoSuppliers);
+    }
+ 
+    btn.innerHTML = 'Find Suppliers →';
+    btn.disabled = false;
+  }
+ 
+  // ── Order modal ──
+  function openModal(supplierId, supplierName) {
+    currentSupplierId   = supplierId;
+    currentSupplierName = supplierName;
+    document.getElementById('modal-supplier-name').textContent = `Ordering from: ${supplierName}`;
+    document.getElementById('modal-delivery-addr').value = '';
+    document.getElementById('modal-notes').value = '';
+    document.getElementById('order-modal').classList.add('open');
+  }
+ 
+  function closeModal() {
+    document.getElementById('order-modal').classList.remove('open');
+  }
+ 
+  function addItemRow() {
+    const container = document.getElementById('items-container');
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.style.marginTop = '10px';
+    row.innerHTML = `
+      <div><input type="text" placeholder="Item name" class="item-name" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--white);font-family:var(--font-body);font-size:0.9rem;outline:none;"/></div>
+      <div><input type="number" placeholder="Qty" class="item-qty" min="1" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--white);font-family:var(--font-body);font-size:0.9rem;outline:none;"/></div>
+      <div><select class="item-unit" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--white);font-family:var(--font-body);font-size:0.9rem;outline:none;"><option>kg</option><option>litre</option><option>dozen</option><option>piece</option><option>bag</option></select></div>
+    `;
+    container.appendChild(row);
+  }
+ 
+  // ── Place order ──
+  async function placeOrder() {
+    const names = document.querySelectorAll('.item-name');
+    const qtys  = document.querySelectorAll('.item-qty');
+    const units = document.querySelectorAll('.item-unit');
+    const deliveryAddress = document.getElementById('modal-delivery-addr').value.trim();
+    const notes = document.getElementById('modal-notes').value.trim();
+ 
+    if (!deliveryAddress) {
+      alert('Please enter your delivery address.');
+      return;
+    }
+ 
+    const items = [];
+    names.forEach((n, i) => {
+      if (n.value.trim()) {
+        items.push({ name: n.value.trim(), quantity: parseInt(qtys[i].value) || 1, unit: units[i].value });
+      }
+    });
+ 
+    if (items.length === 0) {
+      alert('Please add at least one item.');
+      return;
+    }
+ 
+    const btn = document.querySelector('.place-btn');
+    btn.innerHTML = '<span class="spinner"></span>Placing...';
+    btn.disabled = true;
+ 
+    try {
+      const res = await fetch('/api/orders/place', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ supplierId: currentSupplierId, items, deliveryAddress, notes })
+      });
+ 
+      if (res.ok) {
+        closeModal();
+        showToast('✓ Order placed! Supplier has been notified.');
+        loadMyOrders();
+      } else {
+        // Demo mode — show success anyway
+        closeModal();
+        showToast('✓ Order placed successfully!');
+        addDemoOrder(items, deliveryAddress);
+      }
+    } catch {
+      closeModal();
+      showToast('✓ Order placed successfully!');
+      addDemoOrder(items, deliveryAddress);
+    }
+ 
+    btn.innerHTML = 'Place Order →';
+    btn.disabled = false;
+  }
+ 
+  // ── Demo order (when no real backend order) ──
+  function addDemoOrder(items, address) {
+    const list = document.getElementById('orders-list');
+    const itemText = items.map(i => `${i.quantity} ${i.unit} ${i.name}`).join(', ');
+    const card = document.createElement('div');
+    card.className = 'order-card';
+    card.innerHTML = `
+      <div class="order-top">
+        <div class="order-supplier">${currentSupplierName}</div>
+        <div class="order-date">Just now</div>
+      </div>
+      <div class="order-items">${itemText}</div>
+      <div>📍 ${address}</div>
+      <div style="margin-top:10px;"><span class="status-badge status-pending">⏳ Pending</span></div>
+    `;
+    list.innerHTML = '';
+    list.prepend(card);
+    updateStats();
+  }
+ 
+  // ── Load real orders from backend ──
+  async function loadMyOrders() {
+    try {
+      const res = await fetch('/api/orders/my-orders', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const list = document.getElementById('orders-list');
+ 
+      if (!data.orders || data.orders.length === 0) {
+        list.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>No orders yet.</p></div>';
+        return;
+      }
+ 
+      list.innerHTML = data.orders.map(o => `
+        <div class="order-card">
+          <div class="order-top">
+            <div class="order-supplier">${o.supplier?.name || 'Supplier'}</div>
+            <div class="order-date">${new Date(o.createdAt).toLocaleDateString()}</div>
+          </div>
+          <div class="order-items">${o.items.map(i => `${i.quantity} ${i.unit} ${i.name}`).join(', ')}</div>
+          <div>📍 ${o.deliveryAddress}</div>
+          <div style="margin-top:10px;"><span class="status-badge status-${o.status}">${statusLabel(o.status)}</span></div>
+        </div>
+      `).join('');
+ 
+      updateStats(data.orders);
+    } catch(e) {}
+  }
+ 
+  function statusLabel(s) {
+    const map = { pending:'⏳ Pending', accepted:'✓ Accepted', preparing:'🔧 Preparing', out_for_delivery:'🚚 Out for delivery', delivered:'✅ Delivered', rejected:'✗ Rejected' };
+    return map[s] || s;
+  }
+ 
+  function updateStats(orders) {
+    const total  = orders ? orders.length : parseInt(document.getElementById('total-orders').textContent) + 1;
+    const active = orders ? orders.filter(o => !['delivered','rejected'].includes(o.status)).length : 1;
+    document.getElementById('total-orders').textContent  = total;
+    document.getElementById('active-orders').textContent = active;
+  }
+ 
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3500);
+  }
+ 
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'index.html';
+  }
+ 
+  // ── AI ASSISTANT LOGIC ──
+  let currentAISessionId = null;
+  const aiRecommendations = {}; // store active recommendation cards data by cardId
+
+  function toggleAIChat() {
+    const popup = document.getElementById('ai-chat-popup');
+    if (popup) {
+      popup.classList.toggle('open');
+      if (popup.classList.contains('open')) {
+        document.getElementById('ai-prompt-input')?.focus();
+      }
+    }
+  }
+
+  // ── Client-side Fallback Generator ──
+  // Recipe data matching the server-side recipeEngine.js
+  const CLIENT_RECIPES = {
+    'Pav Bhaji': {
+      wastage: 0.08,
+      ingredients: [
+        { name: 'Wholesale Potatoes (Aloo)',         perServing: 120, unit: 'g',   packSize: 5,   packUnit: 'kg',    price: 120, supplier: 'Sharma Traders' },
+        { name: 'Ripe Tomatoes (Tamatar)',            perServing: 80,  unit: 'g',   packSize: 5,   packUnit: 'kg',    price: 150, supplier: 'Sharma Traders' },
+        { name: 'Fresh Red Onions (Kanda)',           perServing: 60,  unit: 'g',   packSize: 5,   packUnit: 'kg',    price: 140, supplier: 'Sharma Traders' },
+        { name: 'Commercial Amul Butter Block',       perServing: 25,  unit: 'g',   packSize: 1,   packUnit: 'kg',    price: 480, supplier: 'Sharma Traders' },
+        { name: 'Fresh Bakery Pav Buns (Pack of 50)', perServing: 2,   unit: 'pcs', packSize: 50,  packUnit: 'pcs',   price: 150, supplier: 'Sharma Traders' },
+        { name: 'Fresh Green Capsicum (Shimla Mirch)', perServing: 30, unit: 'g',   packSize: 2,   packUnit: 'kg',    price: 80,  supplier: 'Sharma Traders' },
+        { name: 'Green Peas (Matar)',                 perServing: 30,  unit: 'g',   packSize: 1,   packUnit: 'kg',    price: 100, supplier: 'Sharma Traders' },
+        { name: 'Refined Sunflower Oil (5L Can)',     perServing: 10,  unit: 'ml',  packSize: 5,   packUnit: 'litre', price: 680, supplier: 'Sharma Traders' },
+        { name: 'Special Pav Bhaji Masala',           perServing: 5,   unit: 'g',   packSize: 0.5, packUnit: 'kg',    price: 240, supplier: 'Sharma Traders' },
+        { name: 'Fresh Garlic (Lehsun)',              perServing: 8,   unit: 'g',   packSize: 1,   packUnit: 'kg',    price: 120, supplier: 'Sharma Traders' },
+        { name: 'Fresh Ginger (Adrak)',               perServing: 5,   unit: 'g',   packSize: 1,   packUnit: 'kg',    price: 80,  supplier: 'Sharma Traders' },
+        { name: 'Fresh Coriander (Kothmir)',          perServing: 5,   unit: 'g',   packSize: 1,   packUnit: 'kg',    price: 60,  supplier: 'Sharma Traders' },
+        { name: 'Fresh Lemons (Nimbu)',               perServing: 0.5, unit: 'pcs', packSize: 1,   packUnit: 'kg',    price: 90,  supplier: 'Sharma Traders' }
+      ]
+    },
+    'Vada Pav': {
+      wastage: 0.07,
+      ingredients: [
+        { name: 'Wholesale Potatoes (Aloo)',         perServing: 100, unit: 'g',   packSize: 5,  packUnit: 'kg',    price: 120, supplier: 'Sharma Traders' },
+        { name: 'Fresh Bakery Pav Buns (Pack of 50)', perServing: 1,  unit: 'pcs', packSize: 50, packUnit: 'pcs',   price: 150, supplier: 'Sharma Traders' },
+        { name: 'Besan (Gram Flour)',                perServing: 30,  unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 90,  supplier: 'Sharma Traders' },
+        { name: 'Refined Sunflower Oil (5L Can)',    perServing: 25,  unit: 'ml',  packSize: 5,  packUnit: 'litre', price: 680, supplier: 'Sharma Traders' },
+        { name: 'Fresh Green Chilies (Mirchi)',      perServing: 8,   unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 80,  supplier: 'Sharma Traders' },
+        { name: 'Fresh Garlic (Lehsun)',             perServing: 10,  unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 120, supplier: 'Sharma Traders' },
+        { name: 'Spices & Salt Mix',                 perServing: 5,   unit: 'g',   packSize: 0.5,packUnit: 'kg',    price: 80,  supplier: 'Sharma Traders' }
+      ]
+    },
+    'Pani Puri': {
+      wastage: 0.05,
+      ingredients: [
+        { name: 'Ready Puri Shells (Pack of 200)',   perServing: 6,   unit: 'pcs', packSize: 200,packUnit: 'pcs',   price: 120, supplier: 'Sharma Traders' },
+        { name: 'Wholesale Potatoes (Aloo)',         perServing: 40,  unit: 'g',   packSize: 5,  packUnit: 'kg',    price: 120, supplier: 'Sharma Traders' },
+        { name: 'Black Chana / Kala Chana',          perServing: 20,  unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 90,  supplier: 'Sharma Traders' },
+        { name: 'Fresh Mint Leaves (Pudina)',         perServing: 15,  unit: 'g',   packSize: 0.5,packUnit: 'kg',    price: 50,  supplier: 'Sharma Traders' },
+        { name: 'Fresh Coriander (Kothmir)',         perServing: 15,  unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 60,  supplier: 'Sharma Traders' },
+        { name: 'Fresh Green Chilies (Mirchi)',      perServing: 5,   unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 80,  supplier: 'Sharma Traders' },
+        { name: 'Tamarind Block (Imli)',             perServing: 15,  unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 100, supplier: 'Sharma Traders' },
+        { name: 'Pani Puri Masala (Black Salt Mix)', perServing: 5,   unit: 'g',   packSize: 0.5,packUnit: 'kg',    price: 120, supplier: 'Sharma Traders' }
+      ]
+    },
+    'Samosa': {
+      wastage: 0.07,
+      ingredients: [
+        { name: 'Wholesale Potatoes (Aloo)',         perServing: 80,  unit: 'g',   packSize: 5,  packUnit: 'kg',    price: 120, supplier: 'Sharma Traders' },
+        { name: 'Refined Maida (All Purpose Flour)', perServing: 40,  unit: 'g',   packSize: 5,  packUnit: 'kg',    price: 80,  supplier: 'Sharma Traders' },
+        { name: 'Green Peas (Matar)',                perServing: 20,  unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 100, supplier: 'Sharma Traders' },
+        { name: 'Refined Sunflower Oil (5L Can)',    perServing: 30,  unit: 'ml',  packSize: 5,  packUnit: 'litre', price: 680, supplier: 'Sharma Traders' },
+        { name: 'Samosa Masala (Garam Masala)',      perServing: 5,   unit: 'g',   packSize: 0.5,packUnit: 'kg',    price: 150, supplier: 'Sharma Traders' },
+        { name: 'Green Chilies & Ginger',            perServing: 6,   unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 80,  supplier: 'Sharma Traders' }
+      ]
+    },
+    'Dosa': {
+      wastage: 0.06,
+      ingredients: [
+        { name: 'Dosa / Idli Rice (Chawal)',         perServing: 80,  unit: 'g',   packSize: 25, packUnit: 'kg',    price: 900, supplier: 'Sharma Traders' },
+        { name: 'Urad Dal (White Lentil)',           perServing: 25,  unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 120, supplier: 'Sharma Traders' },
+        { name: 'Wholesale Potatoes (Aloo)',         perServing: 60,  unit: 'g',   packSize: 5,  packUnit: 'kg',    price: 120, supplier: 'Sharma Traders' },
+        { name: 'Fresh Red Onions (Kanda)',          perServing: 30,  unit: 'g',   packSize: 5,  packUnit: 'kg',    price: 140, supplier: 'Sharma Traders' },
+        { name: 'Refined Sunflower Oil (5L Can)',    perServing: 15,  unit: 'ml',  packSize: 5,  packUnit: 'litre', price: 680, supplier: 'Sharma Traders' },
+        { name: 'Spices & Salt Mix',                 perServing: 4,   unit: 'g',   packSize: 0.5,packUnit: 'kg',    price: 80,  supplier: 'Sharma Traders' }
+      ]
+    },
+    'Poha': {
+      wastage: 0.05,
+      ingredients: [
+        { name: 'Thick Poha (Flattened Rice)',       perServing: 70,  unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 75,  supplier: 'Sharma Traders' },
+        { name: 'Fresh Red Onions (Kanda)',          perServing: 40,  unit: 'g',   packSize: 5,  packUnit: 'kg',    price: 140, supplier: 'Sharma Traders' },
+        { name: 'Wholesale Potatoes (Aloo)',         perServing: 30,  unit: 'g',   packSize: 5,  packUnit: 'kg',    price: 120, supplier: 'Sharma Traders' },
+        { name: 'Refined Sunflower Oil (5L Can)',    perServing: 15,  unit: 'ml',  packSize: 5,  packUnit: 'litre', price: 680, supplier: 'Sharma Traders' },
+        { name: 'Peanuts / Singdana (1kg Pack)',     perServing: 15,  unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 160, supplier: 'Sharma Traders' },
+        { name: 'Green Chilies & Turmeric',          perServing: 5,   unit: 'g',   packSize: 0.5,packUnit: 'kg',    price: 80,  supplier: 'Sharma Traders' },
+        { name: 'Fresh Coriander & Lemon',           perServing: 5,   unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 60,  supplier: 'Sharma Traders' }
+      ]
+    },
+    'Chole Bhature': {
+      wastage: 0.08,
+      ingredients: [
+        { name: 'Kabuli Chana (Chickpeas)',          perServing: 80,  unit: 'g',   packSize: 5,  packUnit: 'kg',    price: 350, supplier: 'Sharma Traders' },
+        { name: 'Refined Maida (All Purpose Flour)', perServing: 70,  unit: 'g',   packSize: 5,  packUnit: 'kg',    price: 80,  supplier: 'Sharma Traders' },
+        { name: 'Fresh Red Onions (Kanda)',          perServing: 50,  unit: 'g',   packSize: 5,  packUnit: 'kg',    price: 140, supplier: 'Sharma Traders' },
+        { name: 'Ripe Tomatoes (Tamatar)',           perServing: 40,  unit: 'g',   packSize: 5,  packUnit: 'kg',    price: 150, supplier: 'Sharma Traders' },
+        { name: 'Refined Sunflower Oil (5L Can)',    perServing: 35,  unit: 'ml',  packSize: 5,  packUnit: 'litre', price: 680, supplier: 'Sharma Traders' },
+        { name: 'Curd / Dahi (Fresh)',               perServing: 15,  unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 90,  supplier: 'Sharma Traders' },
+        { name: 'Chole Masala / Chana Masala',       perServing: 8,   unit: 'g',   packSize: 0.5,packUnit: 'kg',    price: 200, supplier: 'Sharma Traders' },
+        { name: 'Fresh Ginger & Garlic Paste',       perServing: 8,   unit: 'g',   packSize: 1,  packUnit: 'kg',    price: 100, supplier: 'Sharma Traders' }
+      ]
+    }
+  };
+
+  function generateClientFallbackRecommendation(promptText) {
+    const clean = promptText.toLowerCase();
+    
+    // Dish detection — must check compound names first
+    let dish = null;
+    if (clean.includes('pav') && clean.includes('bhaji')) dish = 'Pav Bhaji';
+    else if (clean.includes('chole') || clean.includes('bhature')) dish = 'Chole Bhature';
+    else if (clean.includes('pani puri') || clean.includes('panipuri') || clean.includes('gol gappa')) dish = 'Pani Puri';
+    else if (clean.includes('vada') || clean.includes('wada')) dish = 'Vada Pav';
+    else if (clean.includes('samosa')) dish = 'Samosa';
+    else if (clean.includes('dosa') || clean.includes('dhosa')) dish = 'Dosa';
+    else if (clean.includes('poha') || clean.includes('pohe')) dish = 'Poha';
+    else if (clean.includes('puri')) dish = 'Pani Puri';
+    else if (clean.includes('pav')) dish = 'Pav Bhaji';
+
+    // Servings detection
+    const MIN_SERVINGS = 10;
+    let servings = 100;
+    let requestedServings = null;
+    let isBelowMinServings = false;
+    const servMatch = clean.match(/(\d+)\s*(plates|servings|people|pax)/i) || clean.match(/\b(\d{1,4})\b/);
+    if (servMatch) {
+      const num = parseInt(servMatch[1]);
+      if (num > 0 && num < 5000) {
+        requestedServings = num;
+        if (num < MIN_SERVINGS) {
+          isBelowMinServings = true;
+          servings = MIN_SERVINGS;
+        } else {
+          servings = num;
+        }
+      }
+    }
+
+    // Budget detection ONLY if specified by customer
+    let budget = null;
+    const budMatch = clean.match(/(?:budget|under|max|cost|in)\s*(?:of|is|:)?\s*(?:₹|rs\.?|rupees)\s*([\d,]+)/i) ||
+                     clean.match(/(?:₹|rs\.?|rupees)\s*([\d,]+)/i);
+    if (budMatch) {
+      const val = parseInt(budMatch[1].replace(/,/g, ''));
+      if (!isNaN(val) && val > 0 && val !== servings) budget = val;
+    }
+
+    // If no dish detected, ask user to specify
+    if (!dish) {
+      return {
+        dish: null,
+        servings,
+        requestedServings: requestedServings || servings,
+        isBelowMinServings,
+        minServings: MIN_SERVINGS,
+        wastagePercent: 8,
+        targetBudget: budget,
+        totalEstimatedCost: 0,
+        budgetStatus: 'none',
+        budgetMessage: '',
+        items: [],
+        noRecipe: true
+      };
+    }
+
+    const recipe = CLIENT_RECIPES[dish];
+    const wastage = recipe.wastage;
+    const wastagePercent = Math.round(wastage * 100);
+
+    // Build items from recipe data
+    const items = recipe.ingredients.map(ing => {
+      const rawRequired = ing.perServing * servings;
+      const withWastage = rawRequired * (1 + wastage);
+
+      // Convert to product units
+      let requiredInProductUnits = withWastage;
+      if (ing.unit === 'g' && (ing.packUnit === 'kg' || ing.packUnit === 'bag')) {
+        requiredInProductUnits = withWastage / 1000;
+      } else if (ing.unit === 'ml' && ing.packUnit === 'litre') {
+        requiredInProductUnits = withWastage / 1000;
+      } else if (ing.unit === 'pcs' && ing.packUnit === 'pcs') {
+        requiredInProductUnits = withWastage;
+      } else if (ing.unit === 'g' && ing.packUnit === 'pcs') {
+        requiredInProductUnits = withWastage;
+      }
+
+      const packsToOrder = Math.max(1, Math.ceil(requiredInProductUnits / ing.packSize));
+      const itemTotalCost = packsToOrder * ing.price;
+
+      return {
+        productName: ing.name,
+        packSize: ing.packSize,
+        packUnit: ing.packUnit,
+        pricePerPack: ing.price,
+        packsToOrder,
+        recipeUnit: ing.unit,
+        withWastage: Math.round(withWastage),
+        wastagePercent,
+        supplierName: ing.supplier,
+        supplierId: ing.supplierId || null,
+        itemTotalCost,
+        totalPurchasedQuantity: packsToOrder * ing.packSize
+      };
+    });
+
+    let totalEstimatedCost = 0;
+    items.forEach(i => {
+      i.itemTotalCost = i.packsToOrder * i.pricePerPack;
+      i.totalPurchasedQuantity = i.packsToOrder * i.packSize;
+      totalEstimatedCost += i.itemTotalCost;
+    });
+
+    let budgetStatus = 'none';
+    let budgetMessage = '';
+    if (budget !== null) {
+      const isOver = totalEstimatedCost > budget;
+      const diff = Math.abs(budget - totalEstimatedCost);
+      budgetStatus = isOver ? 'over_budget' : 'under_budget';
+      budgetMessage = isOver ? `Exceeds target budget by ₹${diff.toLocaleString('en-IN')}` : `Within budget! Saved ₹${diff.toLocaleString('en-IN')}`;
+    }
+
+    return {
+      dish,
+      servings,
+      requestedServings: requestedServings || servings,
+      isBelowMinServings,
+      minServingsNotice: isBelowMinServings ? `Minimum wholesale threshold applied: RAWWMART provides bulk raw materials for a minimum of ${MIN_SERVINGS} servings.` : null,
+      minServings: MIN_SERVINGS,
+      wastagePercent: 8,
+      targetBudget: budget,
+      totalEstimatedCost,
+      budgetStatus,
+      budgetMessage,
+      items
+    };
+  }
+
+  function handleKeyPress(e) {
+    if (e.key === 'Enter') {
+      sendAIPrompt();
+    }
+  }
+
+  function sendQuickPrompt(promptText) {
+    document.getElementById('ai-prompt-input').value = promptText;
+    sendAIPrompt();
+  }
+
+  async function sendAIPrompt() {
+    const input = document.getElementById('ai-prompt-input');
+    const promptText = input.value.trim();
+    if (!promptText) return;
+
+    const chatBox = document.getElementById('ai-chat-box');
+    const sendBtn = document.getElementById('ai-send-btn');
+
+    // 1. Add User Message
+    const userDiv = document.createElement('div');
+    userDiv.className = 'chat-msg user';
+    userDiv.innerHTML = `
+      <div class="msg-avatar">👤</div>
+      <div class="msg-content">${escapeHtml(promptText)}</div>
+    `;
+    chatBox.appendChild(userDiv);
+    chatBox.scrollTop += 200; // Small scroll to show new message appeared
+
+    // Clear input
+    input.value = '';
+
+    // 2. Add AI Loading Indicator
+    const loadingId = 'loading-' + Date.now();
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'chat-msg assistant';
+    loadingDiv.id = loadingId;
+    loadingDiv.innerHTML = `
+      <div class="msg-avatar">🤖</div>
+      <div class="msg-content"><span class="spinner"></span>Analyzing recipe requirements & matching live RAWWMART suppliers...</div>
+    `;
+    chatBox.appendChild(loadingDiv);
+    chatBox.scrollTop += 200; // Small scroll to show loading indicator
+
+    sendBtn.disabled = true;
+
+    try {
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          sessionId: currentAISessionId,
+          prompt: promptText
+        })
+      });
+
+      // Remove loading indicator
+      const loader = document.getElementById(loadingId);
+      if (loader) loader.remove();
+
+      if (res.ok) {
+        const data = await res.json();
+        currentAISessionId = data.sessionId;
+
+        // Add Assistant text message
+        const aiDiv = document.createElement('div');
+        aiDiv.className = 'chat-msg assistant';
+        
+        let formattedText = escapeHtml(data.message.text || '')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.*?)\*/g, '<i>$1</i>');
+
+        let cardHtml = '';
+        if (data.recommendation && !data.recommendation.error) {
+          const cardId = 'card-' + Date.now();
+          aiRecommendations[cardId] = data.recommendation;
+          cardHtml = renderRecommendationCardHTML(data.recommendation, cardId);
+        }
+
+        aiDiv.innerHTML = `
+          <div class="msg-avatar">🤖</div>
+          <div class="msg-content" style="width:100%;">
+            <div>${formattedText}</div>
+            ${cardHtml}
+          </div>
+        `;
+        chatBox.appendChild(aiDiv);
+      } else {
+        // Fallback: client-side recommendation when backend unavailable
+        const fallbackRec = generateClientFallbackRecommendation(promptText);
+        const aiDiv = document.createElement('div');
+        aiDiv.className = 'chat-msg assistant';
+        if (fallbackRec.noRecipe || !fallbackRec.dish) {
+          aiDiv.innerHTML = `
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-content">I can help calculate raw material requirements! Which dish are you preparing?<br><em>Supported: Pav Bhaji, Vada Pav, Pani Puri, Samosa, Dosa, Poha, Chole Bhature</em></div>
+          `;
+        } else {
+          const cardId = 'card-' + Date.now();
+          aiRecommendations[cardId] = fallbackRec;
+          const cardHtml = renderRecommendationCardHTML(fallbackRec, cardId);
+          const budgetMsg = fallbackRec.targetBudget ? ` with target budget ₹${fallbackRec.targetBudget.toLocaleString('en-IN')}` : '';
+          aiDiv.innerHTML = `
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-content" style="width:100%;">
+              <div>Here is your customized raw material plan for <strong>${fallbackRec.servings} plates of ${fallbackRec.dish}</strong>${budgetMsg}:</div>
+              ${cardHtml}
+            </div>
+          `;
+        }
+        chatBox.appendChild(aiDiv);
+      }
+    } catch (err) {
+      const loader = document.getElementById(loadingId);
+      if (loader) loader.remove();
+
+      const fallbackRec = generateClientFallbackRecommendation(promptText);
+      const aiDiv = document.createElement('div');
+      aiDiv.className = 'chat-msg assistant';
+      if (fallbackRec.noRecipe || !fallbackRec.dish) {
+        aiDiv.innerHTML = `
+          <div class="msg-avatar">🤖</div>
+          <div class="msg-content">I can help calculate raw material requirements! Which dish are you preparing?<br><em>Supported: Pav Bhaji, Vada Pav, Pani Puri, Samosa, Dosa, Poha, Chole Bhature</em></div>
+        `;
+      } else {
+        const cardId = 'card-' + Date.now();
+        aiRecommendations[cardId] = fallbackRec;
+        const cardHtml = renderRecommendationCardHTML(fallbackRec, cardId);
+        const budgetMsg = fallbackRec.targetBudget ? ` with target budget ₹${fallbackRec.targetBudget.toLocaleString('en-IN')}` : '';
+        aiDiv.innerHTML = `
+          <div class="msg-avatar">🤖</div>
+          <div class="msg-content" style="width:100%;">
+            <div>Here is your customized raw material plan for <strong>${fallbackRec.servings} plates of ${fallbackRec.dish}</strong>${budgetMsg}:</div>
+            ${cardHtml}
+          </div>
+        `;
+      }
+      chatBox.appendChild(aiDiv);
+    }
+
+    sendBtn.disabled = false;
+    chatBox.scrollTop += 200; // Small scroll to show AI response appeared
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // ── Render Recommendation Card HTML ──
+  function renderRecommendationCardHTML(rec, cardId) {
+    const hasBudget = rec.targetBudget !== null && rec.targetBudget !== undefined && parseFloat(rec.targetBudget) > 0;
+    
+    let badgeHtml = '';
+    if (hasBudget) {
+      const isOver = rec.budgetStatus === 'over_budget';
+      const badgeClass = isOver ? 'rec-badge over' : 'rec-badge';
+      const badgeText = isOver ? `⚠️ ${rec.budgetMessage}` : `✓ ${rec.budgetMessage || 'Budget Optimized'}`;
+      badgeHtml = `<div class="${badgeClass}">${badgeText}</div>`;
+    }
+
+    const targetBudgetText = hasBudget ? `Target: ₹${parseFloat(rec.targetBudget).toLocaleString('en-IN')}` : 'Market Estimate (No target budget specified)';
+
+    let tableRows = rec.items.map((item, idx) => {
+      const img = item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=80';
+      return `
+        <tr data-item-idx="${idx}">
+          <td>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <img src="${img}" class="prod-img" alt="${escapeHtml(item.productName)}"/>
+              <div>
+                <div style="font-weight:600;color:#fff;">${escapeHtml(item.productName)}</div>
+                <div style="font-size:0.75rem;color:var(--muted);">Req: ${item.withWastage}${item.recipeUnit} (${item.wastagePercent}% wastage buffer)</div>
+                <div style="font-size:0.72rem;color:var(--green);">Supplier: ${escapeHtml(item.supplierName)}</div>
+              </div>
+            </div>
+          </td>
+          <td style="text-align:center;">
+            <input type="number" 
+                   min="1" 
+                   class="qty-input item-qty-input-${cardId}" 
+                   data-idx="${idx}" 
+                   data-price="${item.pricePerPack}" 
+                   data-packsize="${item.packSize}" 
+                   data-unit="${item.packUnit}" 
+                   value="${item.packsToOrder}" 
+                   onchange="recalculateCardTotal('${cardId}')" />
+            <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${item.packSize}${item.packUnit} / pack</div>
+          </td>
+          <td style="text-align:right;">
+            <div>₹${item.pricePerPack}/pack</div>
+            <div style="font-weight:600;color:var(--orange);" id="item-cost-${cardId}-${idx}">
+              ₹${item.itemTotalCost.toLocaleString('en-IN')}
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    return `
+      <div class="rec-card" id="${cardId}">
+        <div class="rec-header">
+          <div>
+            <div class="rec-dish-title">${rec.dish} (${rec.servings} Servings)</div>
+            <div style="font-size:0.78rem;color:var(--muted);">Configured Wastage: ${rec.wastagePercent}% • Commercial Pack Rounding</div>
+          </div>
+          ${badgeHtml}
+        </div>
+        <div class="budget-bar-container">
+          <div><strong>Estimated Cost:</strong> <span id="summary-cost-${cardId}">₹${rec.totalEstimatedCost.toLocaleString('en-IN')}</span></div>
+          <div style="color:var(--muted);">${targetBudgetText}</div>
+        </div>
+
+        <table class="rec-table">
+          <thead>
+            <tr>
+              <th>Matched Supplier Product</th>
+              <th style="text-align:center;">Packs to Buy</th>
+              <th style="text-align:right;">Total Item Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+
+        <div class="rec-footer">
+          <div>
+            <span style="font-size:0.82rem;color:var(--muted);display:block;">Final Recommended Order Total</span>
+            <span class="rec-total" id="footer-total-${cardId}">₹${rec.totalEstimatedCost.toLocaleString('en-IN')}</span>
+          </div>
+          <button class="rec-order-btn" onclick="checkoutAIRecommendation('${cardId}')">
+            Place Order from AI Recommendation →
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── Dynamic Recalculation on Quantity Edit ──
+  function recalculateCardTotal(cardId) {
+    const rec = aiRecommendations[cardId];
+    if (!rec) return;
+
+    const qtyInputs = document.querySelectorAll(`.item-qty-input-${cardId}`);
+    let newTotal = 0;
+
+    qtyInputs.forEach(input => {
+      const idx = parseInt(input.getAttribute('data-idx'));
+      const price = parseFloat(input.getAttribute('data-price'));
+      const newPacks = Math.max(1, parseInt(input.value) || 1);
+      
+      const itemCost = newPacks * price;
+      newTotal += itemCost;
+
+      // Update item recommendation object
+      if (rec.items[idx]) {
+        rec.items[idx].packsToOrder = newPacks;
+        rec.items[idx].itemTotalCost = itemCost;
+        rec.items[idx].totalPurchasedQuantity = newPacks * rec.items[idx].packSize;
+      }
+
+      // Update UI row cost
+      const rowCostEl = document.getElementById(`item-cost-${cardId}-${idx}`);
+      if (rowCostEl) {
+        rowCostEl.textContent = `₹${itemCost.toLocaleString('en-IN')}`;
+      }
+    });
+
+    rec.totalEstimatedCost = newTotal;
+
+    // Update Card Totals UI
+    const summaryEl = document.getElementById(`summary-cost-${cardId}`);
+    const footerEl = document.getElementById(`footer-total-${cardId}`);
+    if (summaryEl) summaryEl.textContent = `₹${newTotal.toLocaleString('en-IN')}`;
+    if (footerEl) footerEl.textContent = `₹${newTotal.toLocaleString('en-IN')}`;
+  }
+
+  // ── Checkout & Place AI Recommendation Order ──
+  async function checkoutAIRecommendation(cardId) {
+    const rec = aiRecommendations[cardId];
+    if (!rec || !rec.items || rec.items.length === 0) {
+      alert('Recommendation details not found.');
+      return;
+    }
+
+    const defaultAddr = user.deliveryAddress || 'Stall 7, Shivaji Market, Pune 411001';
+    const address = prompt('Confirm delivery address for your AI recommended raw materials:', defaultAddr);
+    if (!address || !address.trim()) {
+      return;
+    }
+
+    // Get supplierId from the first item in the recommendation
+    const supplierId = rec.items[0]?.supplierId || null;
+
+    const btn = document.querySelector(`#${cardId} .rec-order-btn`);
+    if (btn) {
+      btn.innerHTML = '<span class="spinner"></span>Placing Order...';
+      btn.disabled = true;
+    }
+
+    try {
+      const res = await fetch('/api/ai/order-recommendation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          supplierId: supplierId,
+          items: rec.items,
+          deliveryAddress: address,
+          notes: `AI Recommendation Order for ${rec.servings} plates of ${rec.dish}`
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        showToast('✓ AI Recommendation Order placed successfully with supplier!');
+        loadMyOrders();
+        
+        if (btn) {
+          btn.innerHTML = '✓ Order Confirmed!';
+          btn.style.background = 'var(--green)';
+        }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(`Could not place order: ${errData.message || 'Server error'}`);
+        if (btn) {
+          btn.innerHTML = 'Place Order from AI Recommendation →';
+          btn.disabled = false;
+        }
+      }
+    } catch (err) {
+      alert('Network error placing order. Please try again.');
+      if (btn) {
+        btn.innerHTML = 'Place Order from AI Recommendation →';
+        btn.disabled = false;
+      }
+    }
+  }
+
+  // Load orders on page load
+  loadMyOrders();
+</script>
+</body>
+</html>
